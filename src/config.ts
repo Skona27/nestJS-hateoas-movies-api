@@ -11,7 +11,7 @@ export const config: IConfig = {
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_DATABASE,
-    entities: ['src/**/entities/*{.ts,.js}'],
+    entities: ['dist/**/entity{.ts,.js}'],
     synchronize: true,
     logging: true,
   },
