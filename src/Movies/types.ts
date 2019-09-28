@@ -11,3 +11,12 @@ export interface IMovie {
   createdAt: Date;
   modifiedAt: Date;
 }
+
+export type IMovieLinkType = 'self' | 'update' | 'delete';
+export type IPageLinkType = 'next' | 'prev';
+
+export interface ILink {
+  rel: IMovieLinkType | IPageLinkType;
+  method: string;
+  href: string;
+}
