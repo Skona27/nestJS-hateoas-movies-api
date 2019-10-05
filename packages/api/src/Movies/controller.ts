@@ -2,12 +2,8 @@ import { Controller, Get, Param, Req, Query } from '@nestjs/common';
 import { Request } from 'express';
 
 import { MovieService } from './service';
-import {
-  mapMovieLinksByType,
-  mapMovieForResponse,
-  mapPageLinks,
-} from './helpers';
 import { IMovieLinkType } from './types';
+import { mapMovieLinksByType, mapPageLinks, getSortOrder } from './helpers';
 import { ISingleMovieResponseDTO, IAllMoviesResponse } from './dto';
 
 const isUserLoggedIn = false;
@@ -21,24 +17,41 @@ export class MoviesController {
     @Req() request: Request,
     @Query('perPage') perPage: string,
     @Query('offset') offset: string,
+    @Query('search') search: string,
+    @Query('sortBy') sortBy: string,
+    @Query('order') order: string,
   ): Promise<IAllMoviesResponse> {
     const skipCount = parseInt(offset, 10) || 0;
     const takeCount = parseInt(perPage, 10) || 3;
     const pageNumber = (takeCount + skipCount) / takeCount;
 
-    const [totalCount, movies] = await Promise.all([
-      await this.movieService.countAll(),
-      await this.movieService.findAll(takeCount, skipCount),
-    ]);
+    const searchQuery = search || '';
+    const sortOrder = getSortOrder(order);
+
+    const [movies, totalCount] = await this.movieService.findAll(
+      takeCount,
+      skipCount,
+      searchQuery,
+      sortBy,
+      sortOrder,
+    );
 
     const mapMovieLinks = mapMovieLinksByType(['self'], request);
 
     const moviesData = movies.map(movie => ({
-      ...mapMovieForResponse(movie),
+      ...movie,
       links: mapMovieLinks(movie),
     }));
 
-    const pageLinks = mapPageLinks(totalCount, takeCount, skipCount, request);
+    const pageLinks = mapPageLinks(
+      totalCount,
+      takeCount,
+      skipCount,
+      searchQuery,
+      sortBy,
+      sortOrder,
+      request,
+    );
 
     const response = {
       totalCount,
@@ -64,6 +77,6 @@ export class MoviesController {
 
     const mapMovieLinks = mapMovieLinksByType(linkTypes, request);
 
-    return { ...mapMovieForResponse(movie), links: mapMovieLinks(movie) };
+    return { ...movie, links: mapMovieLinks(movie) };
   }
 }

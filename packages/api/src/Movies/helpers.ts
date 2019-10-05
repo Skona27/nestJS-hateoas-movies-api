@@ -1,14 +1,10 @@
 import { Request } from 'express';
+import { Like } from 'typeorm';
 
-import { IMovie, IMovieLinkType, ILink, IPageLinkType } from './types';
+import { IMovie, IMovieLinkType, ILink } from './types';
+import { sortableFields as sortableFieldsConst } from './constants';
 
 export const getUrl = (request: Request) => `http://${request.headers.host}`;
-
-export const mapMovieForResponse = ({
-  createdAt,
-  modifiedAt,
-  ...movie
-}: IMovie): Omit<IMovie, 'createdAt' | 'modifiedAt'> => ({ ...movie });
 
 export const mapMovieLinksByType = (
   types: IMovieLinkType[],
@@ -78,6 +74,9 @@ export const mapPageLinks = (
   totalCount: number,
   perPage: number,
   offset: number,
+  searchQuery: string,
+  sortBy: string,
+  order: 'ASC' | 'DESC',
   request: Request,
 ) => {
   const links = [];
@@ -85,6 +84,10 @@ export const mapPageLinks = (
 
   const doesPreviousLinkExist = offset > 0;
   const doesNextLinkExist = totalCount > perPage + offset;
+  const doesSearchQueryExist = searchQuery.length > 0;
+  const doesSortConditionExist =
+    Object.keys(getSortCondition(sortableFieldsConst)(sortBy, order)).length >
+    0;
 
   if (doesPreviousLinkExist) {
     links.push(mapPreviousPageLink(perPage, offset, url));
@@ -94,5 +97,39 @@ export const mapPageLinks = (
     links.push(mapNextPageLink(perPage, offset, url));
   }
 
+  if (doesSearchQueryExist) {
+    const appendSearchQuery = appendSearchQueryToLink(searchQuery);
+    links.forEach(appendSearchQuery);
+  }
+
+  if (doesSortConditionExist) {
+    const appendSortCondition = appendSortConditionToLink(sortBy, order);
+    links.forEach(appendSortCondition);
+  }
+
   return links;
+};
+
+export const getSearchConditions = (searchableFields: string[]) => (
+  query: string,
+) => searchableFields.map(field => ({ [field]: Like(`%${query}%`) }));
+
+export const getSortCondition = (sortableFields: string[]) => (
+  field: string,
+  order: 'ASC' | 'DESC',
+) => {
+  return sortableFields.includes(field) ? { [field]: order } : {};
+};
+
+export const getSortOrder = (order: string | null) =>
+  order && order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+const appendSearchQueryToLink = (searchQuery: string) => (link: ILink) => {
+  link.href += `&search=${searchQuery}`;
+};
+
+const appendSortConditionToLink = (sortBy: string, order: string) => (
+  link: ILink,
+) => {
+  link.href += `&sortBy=${sortBy}&order=${order}`;
 };
