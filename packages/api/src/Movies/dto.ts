@@ -5,10 +5,17 @@ export interface ISingleMovieResponseDTO
   links: ILink[];
 }
 
-export interface IAllMoviesResponse {
+export interface IAllMoviesResponseDTO {
   totalCount: number;
   perPage: number;
   pageNumber: number;
   movies: ISingleMovieResponseDTO[];
   links: ILink[];
 }
+
+export type IMovieForCreationDTO = Omit<
+  IMovie,
+  'id' | 'createdAt' | 'modifiedAt'
+>;
+
+export type IMovieForResponseDTO = Omit<IMovie, 'createdAt' | 'modifiedAt'>;

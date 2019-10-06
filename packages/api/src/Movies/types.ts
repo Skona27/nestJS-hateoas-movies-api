@@ -8,15 +8,15 @@ export interface IMovie {
   language: string;
   length: number;
   rate: string;
-  createdAt: Date;
-  modifiedAt: Date;
+  createdAt: string;
+  modifiedAt: string;
 }
-
-export type IMovieLinkType = 'self' | 'update' | 'delete';
-export type IPageLinkType = 'next' | 'prev';
 
 export interface ILink {
   rel: IMovieLinkType | IPageLinkType;
   method: string;
   href: string;
 }
+
+export type IMovieLinkType = 'self' | 'update' | 'delete';
+export type IPageLinkType = 'next' | 'prev';

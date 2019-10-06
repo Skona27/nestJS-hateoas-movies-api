@@ -1,7 +1,8 @@
 import { Request } from 'express';
 import { Like } from 'typeorm';
 
-import { IMovie, IMovieLinkType, ILink } from './types';
+import { IMovieForResponseDTO } from './dto';
+import { IMovieLinkType, ILink } from './types';
 import { sortableFields as sortableFieldsConst } from './constants';
 
 export const getUrl = (request: Request) => `http://${request.headers.host}`;
@@ -9,34 +10,44 @@ export const getUrl = (request: Request) => `http://${request.headers.host}`;
 export const mapMovieLinksByType = (
   types: IMovieLinkType[],
   request: Request,
-) => (movie: IMovie): ILink[] => {
+) => (movie: IMovieForResponseDTO): ILink[] => {
   const url = getUrl(request);
   const mapLinks = mapSingleMovieLink(movie, url);
 
   return types.map(mapLinks);
 };
 
-export const mapSelfLink = (movie: IMovie, url: string): ILink => ({
+export const mapSelfLink = (
+  movie: IMovieForResponseDTO,
+  url: string,
+): ILink => ({
   rel: 'self',
   method: 'GET',
   href: `${url}/movies/${movie.id}`,
 });
 
-export const mapUpdateLink = (movie: IMovie, url: string): ILink => ({
+export const mapUpdateLink = (
+  movie: IMovieForResponseDTO,
+  url: string,
+): ILink => ({
   rel: 'update',
   method: 'PUT',
   href: `${url}/movies/${movie.id}`,
 });
 
-export const mapDeleteLink = (movie: IMovie, url: string): ILink => ({
+export const mapDeleteLink = (
+  movie: IMovieForResponseDTO,
+  url: string,
+): ILink => ({
   rel: 'delete',
   method: 'DELETE',
   href: `${url}/movies/${movie.id}`,
 });
 
-export const mapSingleMovieLink = (movie: IMovie, url: string) => (
-  type: IMovieLinkType,
-): ILink => {
+export const mapSingleMovieLink = (
+  movie: IMovieForResponseDTO,
+  url: string,
+) => (type: IMovieLinkType): ILink => {
   switch (type) {
     case 'self':
       return mapSelfLink(movie, url);

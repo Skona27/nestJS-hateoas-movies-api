@@ -1,9 +1,9 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { IMovie } from './types';
 
 @Entity()
 export class Movie implements IMovie {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column()
@@ -30,9 +30,9 @@ export class Movie implements IMovie {
   @Column()
   rate: string;
 
-  @Column()
-  createdAt: Date;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: string;
 
-  @Column({ nullable: true })
-  modifiedAt: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  modifiedAt: string;
 }

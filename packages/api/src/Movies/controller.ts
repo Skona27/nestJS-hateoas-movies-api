@@ -1,10 +1,14 @@
-import { Controller, Get, Param, Req, Query } from '@nestjs/common';
+import { Controller, Get, Param, Req, Query, Post, Body } from '@nestjs/common';
 import { Request } from 'express';
 
 import { MovieService } from './service';
 import { IMovieLinkType } from './types';
 import { mapMovieLinksByType, mapPageLinks, getSortOrder } from './helpers';
-import { ISingleMovieResponseDTO, IAllMoviesResponse } from './dto';
+import {
+  ISingleMovieResponseDTO,
+  IAllMoviesResponseDTO,
+  IMovieForCreationDTO,
+} from './dto';
 
 const isUserLoggedIn = false;
 
@@ -20,7 +24,7 @@ export class MoviesController {
     @Query('search') search: string,
     @Query('sortBy') sortBy: string,
     @Query('order') order: string,
-  ): Promise<IAllMoviesResponse> {
+  ): Promise<IAllMoviesResponseDTO> {
     const skipCount = parseInt(offset, 10) || 0;
     const takeCount = parseInt(perPage, 10) || 3;
     const pageNumber = (takeCount + skipCount) / takeCount;
@@ -76,7 +80,21 @@ export class MoviesController {
       : [];
 
     const mapMovieLinks = mapMovieLinksByType(linkTypes, request);
+    return { ...movie, links: mapMovieLinks(movie) };
+  }
 
+  @Post('')
+  async create(
+    @Req() request: Request,
+    @Body() movieForCreation: IMovieForCreationDTO,
+  ) {
+    const movie = await this.movieService.create(movieForCreation);
+
+    const linkTypes: IMovieLinkType[] = isUserLoggedIn
+      ? ['update', 'delete']
+      : [];
+
+    const mapMovieLinks = mapMovieLinksByType(linkTypes, request);
     return { ...movie, links: mapMovieLinks(movie) };
   }
 }

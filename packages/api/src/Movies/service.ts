@@ -10,6 +10,7 @@ import {
   sortableFields,
   movieFieldsToSelect,
 } from './constants';
+import { IMovieForCreationDTO, IMovieForResponseDTO } from './dto';
 
 @Injectable()
 export class MovieService {
@@ -44,5 +45,12 @@ export class MovieService {
       select: movieFieldsToSelect,
     } as FindConditions<Movie>);
     return movie;
+  }
+
+  async create(
+    movieForCreation: IMovieForCreationDTO,
+  ): Promise<IMovieForResponseDTO> {
+    const movie = await this.movieRepository.insert(movieForCreation);
+    return { ...movieForCreation, id: movie.identifiers[0].id };
   }
 }
