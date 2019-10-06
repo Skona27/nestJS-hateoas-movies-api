@@ -19,3 +19,4 @@ export type IMovieForCreationDTO = Omit<
 >;
 
 export type IMovieForResponseDTO = Omit<IMovie, 'createdAt' | 'modifiedAt'>;
+export type IMovieForUpdateDTO = Partial<IMovieForCreationDTO>;

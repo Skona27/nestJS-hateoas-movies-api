@@ -1,4 +1,14 @@
-import { Controller, Get, Param, Req, Query, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Req,
+  Query,
+  Post,
+  Body,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { Request } from 'express';
 
 import { MovieService } from './service';
@@ -8,6 +18,7 @@ import {
   ISingleMovieResponseDTO,
   IAllMoviesResponseDTO,
   IMovieForCreationDTO,
+  IMovieForUpdateDTO,
 } from './dto';
 
 const isUserLoggedIn = false;
@@ -96,5 +107,18 @@ export class MoviesController {
 
     const mapMovieLinks = mapMovieLinksByType(linkTypes, request);
     return { ...movie, links: mapMovieLinks(movie) };
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    await this.movieService.deleteById(id);
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() movieForUpdate: IMovieForUpdateDTO,
+  ) {
+    await this.movieService.updateById(id, movieForUpdate);
   }
 }

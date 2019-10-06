@@ -10,7 +10,11 @@ import {
   sortableFields,
   movieFieldsToSelect,
 } from './constants';
-import { IMovieForCreationDTO, IMovieForResponseDTO } from './dto';
+import {
+  IMovieForCreationDTO,
+  IMovieForResponseDTO,
+  IMovieForUpdateDTO,
+} from './dto';
 
 @Injectable()
 export class MovieService {
@@ -30,21 +34,22 @@ export class MovieService {
     const sortCondition = getSortCondition(sortableFields);
 
     const [movies, count] = await this.movieRepository.findAndCount({
-      select: movieFieldsToSelect,
       take,
       skip,
       where: searchConditions(searchQuery),
       order: sortCondition(sortBy, order),
+      select: movieFieldsToSelect,
     } as FindConditions<Movie>);
     return [movies, count];
   }
 
   async findAById(movieId: string): Promise<IMovie> {
-    const movie = await this.movieRepository.findOne({
-      id: movieId,
+    const movies = await this.movieRepository.find({
+      take: 1,
+      where: { id: movieId },
       select: movieFieldsToSelect,
     } as FindConditions<Movie>);
-    return movie;
+    return movies[0];
   }
 
   async create(
@@ -52,5 +57,17 @@ export class MovieService {
   ): Promise<IMovieForResponseDTO> {
     const movie = await this.movieRepository.insert(movieForCreation);
     return { ...movieForCreation, id: movie.identifiers[0].id };
+  }
+
+  async deleteById(id: string) {
+    await this.movieRepository.delete({ id });
+  }
+
+  async updateById(id: string, movieForUpdate: IMovieForUpdateDTO) {
+    const modifiedAt = new Date().toDateString();
+    await this.movieRepository.update(
+      { id },
+      { ...movieForUpdate, id, modifiedAt },
+    );
   }
 }
