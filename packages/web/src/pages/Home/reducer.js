@@ -1,5 +1,8 @@
+const baseUrl = "http://localhost:3001/movies";
+
 export const initialState = {
-  endpoint: "http://localhost:3001/movies",
+  query: null,
+  endpoint: baseUrl,
   response: {
     totalCount: null,
     perPage: null,
@@ -18,6 +21,12 @@ export const reducer = (state, action) => {
         ...state,
         endpoint: action.payload,
         response: { ...state.response, movies: null }
+      };
+    case "setQuery":
+      return {
+        ...state,
+        response: { ...state.response, movies: null },
+        endpoint: `${baseUrl}?search=${action.payload}`
       };
     default:
       return state;

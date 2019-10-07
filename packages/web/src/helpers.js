@@ -3,7 +3,7 @@ import axios from "axios";
 export const fetchMovies = async url => {
   const [response] = await Promise.all([
     axios.get(url),
-    setTimeoutPromise(500)
+    setTimeoutPromise(200)
   ]);
   return response.data;
 };

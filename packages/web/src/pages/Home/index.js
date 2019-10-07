@@ -4,6 +4,7 @@ import { reducer, initialState } from "./reducer";
 import { fetchMovies } from "../../helpers";
 import { Movies } from "../../components/Movies/index";
 import { Pagination } from "../../components/Pagination/index";
+import { Panel } from "../../components/Panel";
 
 export const Home = () => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
@@ -24,9 +25,8 @@ export const Home = () => {
   return (
     <>
       <h1 style={{ textAlign: "center", marginBottom: 40 }}>Movies Catalog</h1>
-
+      <Panel dispatch={dispatch} />
       <Movies movies={state.response.movies} />
-
       <Pagination
         changePage={changePage}
         links={state.response.links}
