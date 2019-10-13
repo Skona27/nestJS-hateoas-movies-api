@@ -21,7 +21,7 @@ import {
   IMovieForUpdateDTO,
 } from './dto';
 
-const isUserLoggedIn = false;
+const isUserLoggedIn = true;
 
 @Controller('movies')
 export class MoviesController {

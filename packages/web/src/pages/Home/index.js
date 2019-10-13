@@ -1,6 +1,7 @@
 import React from "react";
+import qs from "qs";
 
-import { reducer, initialState } from "./reducer";
+import { reducer, initialState, baseUrl } from "./reducer";
 import { fetchMovies } from "../../helpers";
 import { Movies } from "../../components/Movies/index";
 import { Pagination } from "../../components/Pagination/index";
@@ -8,6 +9,21 @@ import { Panel } from "../../components/Panel";
 
 export const Home = () => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
+
+  React.useEffect(() => {
+    const effect = async () => {
+      const params = qs.stringify({
+        search: state.query,
+        sortBy: state.sortBy,
+        order: state.order
+      });
+      const url = `${baseUrl}?${params}`;
+      const data = await fetchMovies(url);
+      dispatch({ type: "setMoviesData", payload: data });
+    };
+
+    effect();
+  }, [state.query, state.sortBy, state.order]);
 
   React.useEffect(() => {
     const effect = async () => {
